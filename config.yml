@@ -1,0 +1,13 @@
+destinationPath: ./download/
+sourcePaths:
+- "./root/1_RePublic"
+- "./root/4_ReKnife"
+- "./root/7_ReDR"
+- "./root/8_bhop"
+- "./root/ReSwarm_x3_nextgen"
+patterns:
+- "./cstrike/*.wad"
+- "./cstrike/gfx"
+- "./cstrike/maps"
+- "./cstrike/models"
+- "./cstrike/sound"
