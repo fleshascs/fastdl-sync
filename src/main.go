@@ -131,7 +131,8 @@ func makeSymlink(file, destinationDir, sourcePath  string)  error {
 	relativePath := strings.Replace(file, filepath.Join(sourcePath), "", 1)
 	destination := filepath.Join(destinationDir, relativePath)
 	dir, _ := filepath.Split(destination)		
-	cmd :=  exec.Command("/bin/sh", "-c", "mkdir -p " + dir)
+	cmd :=  exec.Command("/bin/sh", "-c", "mkdir -p \"" + dir + "\"")
+	
 	if err := cmd.Run(); err != nil {
 		return errors.New("Error while creating DestinationPath: " + dir + " : " + fmt.Sprint(err))
 	}
