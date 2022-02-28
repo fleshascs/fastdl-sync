@@ -37,21 +37,24 @@ func symlinkWorker()  {
 		for {
 			select {
 			case entry:= <-symlinkCh:
-				if(loader != nil) {
-					loader.Stop()
-				}
-				loader := makeLoader(entry.file,  entry.destinationDir)
-				loader.Start()
-
-				err := makeSymlink(entry.file, entry.destinationDir,entry.sourcePath)
-				if(loader != nil) {
-					loader.Stop()
+				if(loader == nil) {
+					loader = makeLoader()
+					loader.Start()
 				}
 				
+				loader.Prefix = entry.file + " "
+				loader.Suffix = " " + entry.destinationDir 
+				// time.Sleep(1 * time.Second)
+				err := makeSymlink(entry.file, entry.destinationDir,entry.sourcePath)
+
 				if err != nil {
+					loader.Stop()
+					loader = nil
 					fmt.Println(fmt.Sprint(err))
 				}
 			case <-symlinkDoneCh:
+				loader.Stop()
+				loader = nil
 				break L
 			}
 		}
@@ -99,12 +102,10 @@ func main() {
 	}	
 }
 
-func makeLoader(preffix, suffix string) *spinner.Spinner {
+func makeLoader() *spinner.Spinner {
 	loader := spinner.New(spinner.CharSets[43], 100*time.Millisecond) 
-	loader.Prefix = preffix + " "
-	loader.Suffix = " " + suffix 
 	loader.Color("red", "bold")
-	return loader  
+	return loader
 }
 
 func loadConfig() Configurations {
