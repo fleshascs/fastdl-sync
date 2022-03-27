@@ -32,29 +32,37 @@ var loader *spinner.Spinner =  nil
 var symlinkCh = make(chan symlinkEntry)
 var symlinkDoneCh = make(chan struct{})
 
+func startLoader(){
+	if(loader == nil) {
+		loader = makeLoader()
+		loader.Start()
+	}
+}
+
+func stopLoader(){
+	if loader != nil {
+		loader.Stop()
+		loader = nil
+	}
+}
+
 func symlinkWorker()  {
 	L:
 		for {
 			select {
 			case entry:= <-symlinkCh:
-				if(loader == nil) {
-					loader = makeLoader()
-					loader.Start()
-				}
-				
+				startLoader()
 				loader.Prefix = entry.file + " "
 				loader.Suffix = " " + entry.destinationDir 
 				// time.Sleep(1 * time.Second)
 				err := makeSymlink(entry.file, entry.destinationDir,entry.sourcePath)
 
 				if err != nil {
-					loader.Stop()
-					loader = nil
+					stopLoader()
 					fmt.Println(fmt.Sprint(err))
 				}
 			case <-symlinkDoneCh:
-				loader.Stop()
-				loader = nil
+				stopLoader()
 				break L
 			}
 		}
